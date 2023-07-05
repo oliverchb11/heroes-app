@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, Injector, OnInit, signal, Signal, WritableSignal } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeroServicesService } from '../../services/hero-services.service';
@@ -6,7 +6,7 @@ import { HeroesI, Publisher } from '../../interfaces/heroes';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from './dialog.component';
-
+import * as _ from 'lodash';
 @Component({
   selector: 'app-add-hero-page',
   templateUrl: './add-hero-page.component.html',
@@ -20,12 +20,13 @@ export class AddHeroPageComponent implements OnInit {
   private dialog = inject(MatDialog)
   private router = inject(Router);
   private _fb = inject(FormBuilder);
-  private _snackBar = inject(MatSnackBar)
+  private _snackBar = inject(MatSnackBar);
   public form!: FormGroup;
   public publishers = [
     { id: 'DC Comics', desc: 'DC - Comis' },
     { id: 'Marvel Comics', desc: 'Marvel - Comis' },
   ]
+
   public objectEdit = {
     title: '',
     buttonName: '',
@@ -76,7 +77,7 @@ export class AddHeroPageComponent implements OnInit {
         });
       })
     } else {
-        //actualizar hero por que el id llega en la url
+      //actualizar hero por que el id llega en la url
       const { ...object } = this.currentHero;
       object.id = this.optionId;
       this.heroService.updateHero(object).subscribe((respose) => {
@@ -124,13 +125,13 @@ export class AddHeroPageComponent implements OnInit {
    */
   public heroById(id: string): void {
     this.heroService.getHeroesById(id).subscribe(hero => {
-      if(!hero) return this.router.navigateByUrl('/')
+      if (!hero) return this.router.navigateByUrl('/')
       this.form.reset(hero)
       return
     })
   }
 
-  public deleteHero(): void{
+  public deleteHero(): void {    
     if(this.optionId !== undefined){
       const dialogRef = this.dialog.open(DialogComponent, {
         width: '250px',
@@ -138,7 +139,7 @@ export class AddHeroPageComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((option: boolean) => {
       if(option){
-     this.heroService.deleteHeroById(this.optionId).subscribe(isDelete => {
+    this.heroService.deleteHeroById(this.optionId).subscribe(isDelete => {
         if(isDelete){
           this.router.navigateByUrl('/heroes/list');
           this._snackBar.open('Heroe Eliminado correctamente', 'delete', {
@@ -148,9 +149,10 @@ export class AddHeroPageComponent implements OnInit {
       })
       }
     })
- 
+
     }else{
       this.form.reset()
     }
   }
+
 }

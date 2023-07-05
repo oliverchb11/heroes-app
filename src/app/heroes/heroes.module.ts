@@ -30,7 +30,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MaterialModule,
     RouterModule,
     ReactiveFormsModule,
-    FormsModule
   ]
 })
 export class HeroesModule { }
